@@ -18,6 +18,9 @@ from ckanext.harvest.model import HarvestSource
 
 log = logging.getLogger(__name__)
 
+KEY_METADATA_POC = 'metadata-point-of-contact'
+KEY_RESOURCE_POC = 'resource-point-of-contact'
+
 
 class OGDATHarvesterPlugin(plugins.SingletonPlugin):
 
@@ -40,7 +43,7 @@ class OGDATHarvesterPlugin(plugins.SingletonPlugin):
 
     log.info('init: Replacing ISO mapping to metadata PoC')
     for element in s.ISODocument.elements:
-        if element.name == 'metadata-point-of-contact':
+        if element.name == KEY_METADATA_POC:
             log.info('init: Metadata PoC mapping found')
             element.search_paths = ["gmd:contact/gmd:CI_ResponsibleParty"]
             break;
@@ -49,7 +52,7 @@ class OGDATHarvesterPlugin(plugins.SingletonPlugin):
 
     s.ISODocument.elements.append(
         s.ISOResponsibleParty(
-            name="resource-point-of-contact",
+            name=KEY_RESOURCE_POC,
             search_paths=[
                 "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty",
                 "gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty",
@@ -57,7 +60,7 @@ class OGDATHarvesterPlugin(plugins.SingletonPlugin):
             multiplicity="1..*",
         )
     )
-        
+
     # ISpatialHarvester method
     def get_package_dict(self, context, data_dict):
     	# Getting the harvest source config
@@ -89,30 +92,25 @@ class OGDATHarvesterPlugin(plugins.SingletonPlugin):
                   'N/A'
         package_dict['license'] = license
 
-        #metadata-point-of-contact (dataidentification)
-        #responsible-organisation   (dataidentification/pointOfContact)
+        # MAINTAINER
         maintainer = ''
         for role in ('custodian', 'resourceProvider', 'author', None):
-            ind, org, mail = self._find_responsible(iso_values['resource-point-of-contact'], role)
+            ind, org, mail = self._find_responsible(iso_values[KEY_RESOURCE_POC], role)
             if ind or org:
                 maintainer = ind + org
                 break
-        if not maintainer:
-            maintainer = 'default maintainer from config (TODO)'
-        package_dict['maintainer'] = maintainer
+        package_dict['maintainer'] = maintainer or source_config.get('ogd_maintainer', 'N/A');
 
-
+        # PUBLISHER
         publisher = ''
         for role in ('publisher', 'pointOfContact', None):
-            ind, org, mail = self._find_responsible(iso_values['metadata-point-of-contact'], role)
+            ind, org, mail = self._find_responsible(iso_values[KEY_METADATA_POC], role)
             if ind or org:
                 publisher = ind + org
                 break
         if not publisher:
-            publisher = 'default publisher from config (TODO)'
-
+            publisher = source_config.get('ogd_publisher', 'N/A');
         package_dict['extras'].append({'key': 'publisher', 'value': publisher})
-
 
 
 #        ind, org, mail = self._find_responsible(iso_values['metadata-point-of-contact'], 'pointOfContact')
@@ -141,6 +139,14 @@ class OGDATHarvesterPlugin(plugins.SingletonPlugin):
                 tags.append({'name': tag})
 
             package_dict['tags'] = tags
+
+
+        ### OPTIONAL ADDITIONAL FIELDS
+        
+        package_dict['extras'].append({'key': 'schema-name', 'value': 'OGD Austria Metadata 2.3'})
+        package_dict['extras'].append({'key': 'schema-language', 'value': 'ger'})
+        package_dict['extras'].append({'key': 'schema-characterset', 'value': 'utf8'})
+
 
         return package_dict
 
