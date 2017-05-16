@@ -36,15 +36,14 @@ To install *ckanext-ogdat*:
 
      pip install ckanext-ogdat
 
-3a. Add ``ogdat_harvest`` to the ``ckan.plugins`` setting in your CKAN
+3. Add ``ogdat_harvest`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
    ``/etc/ckan/default/production.ini``).
 
-3b. Optionally add ``ogdat_theme`` to the ``ckan.plugins`` setting in your CKAN
-   config file (by default the config file is located at
-   ``/etc/ckan/default/production.ini``).
+4. (Optional) Add ``ogdat_theme`` to the ``ckan.plugins`` setting. This plugin will slightly modify the dataset 
+   view in order to clearly show the OGD-AT attributes.
 
-4.  Add the property::
+5.  Add the property::
 
      licenses_group_url = file:///PATH/TO/YOUR/ckanext-ogdat/ckan.json
 
@@ -54,7 +53,7 @@ To install *ckanext-ogdat*:
 
     If you are already using a license file, please edit it and add the "CC-BY-3.0-AT" license.
 
-999. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
+6. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
      sudo service apache2 reload
 
