@@ -47,8 +47,12 @@
             <td class="dataset-details">{{ h.get_pkg_dict_extra(pkg_dict, 'publisher') or '' }}</td>
           </tr>
           <tr>
-            <th scope="row" class="dataset-label">{{ _('Licence') }}</th>
-            <td class="dataset-details">{{ pkg_dict.license or '' }}</td>
+            <th scope="row" class="dataset-label">{{ _('Licence id') }}</th>
+            <td class="dataset-details">{{ pkg_dict.license_id or '' }}</td>
+          </tr>
+          <tr>
+            <th scope="row" class="dataset-label">{{ _('Licence title') }}</th>
+            <td class="dataset-details">{{ pkg_dict.license_title or '' }}</td>
           </tr>
           <tr>
             <th scope="row" class="dataset-label">{{ _('Begin date') }}</th>
@@ -81,7 +85,7 @@
             ('Update frequency', 'update_frequency', 0),
             ('Data quality and lineage', 'lineage_quality', 0),
             ('English title and description', 'en_title_and_desc', 0),
-            ('Licence citation', 'metadata_original_portal', 0),
+            ('Licence citation', 'license_citation', 0),
           ) %}
 
           {% if h.get_pkg_dict_extra(pkg_dict, key) or force_optional_view %}
@@ -91,6 +95,19 @@
           </tr>
           {% endif %}
        {% endfor %}
+
+       {% if h.get_pkg_dict_extra(pkg_dict, 'metadata_original_portal') %}
+       <tr>
+         <th scope="row" class="dataset-label">{{ _('Metadata original portal') }}</th>
+         <td class="dataset-details"><a href="{{ h.get_pkg_dict_extra(pkg_dict, 'metadata_original_portal') }}">{{ _('Link') }}</a></td>
+       </tr>
+       {% elif force_optional_view %}
+       <tr>
+         <th scope="row" class="dataset-label">{{ _('Metadata original portal') }}</th>
+         <td class="dataset-details"></td>
+       </tr>
+       {% endif %}
+
 
        {% if pkg_dict.maintainer_email or force_optional_view %}
           <tr>

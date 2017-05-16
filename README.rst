@@ -44,7 +44,17 @@ To install *ckanext-ogdat*:
    config file (by default the config file is located at
    ``/etc/ckan/default/production.ini``).
 
-4. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
+4.  Add the property::
+
+     licenses_group_url = file:///PATH/TO/YOUR/ckanext-ogdat/ckan.json
+
+    e.g.::
+
+     licenses_group_url = file:////usr/lib/ckan/default/src/ckanext-ogdat/ckan.json
+
+    If you are already using a license file, please edit it and add the "CC-BY-3.0-AT" license.
+
+999. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
      sudo service apache2 reload
 
