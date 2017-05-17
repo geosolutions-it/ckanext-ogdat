@@ -143,29 +143,12 @@ class OGDATHarvesterPlugin(p.SingletonPlugin):
         s.ISOElement(
             name="title_en",
             search_paths=[
-                "(.)[gmd:language/gmd:LanguageCode/@codeListValue='en']/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString/text()",
+                "(.)[gmd:language/gmd:LanguageCode/@codeListValue='eng']/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString/text()",
                 'gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale="#EN"]/text()',
             ],
             multiplicity="0..1",
         )
     )
-
-    # gmd:distributionInfo 0..1
-    #    /gmd:MD_Distribution
-    #        /gmd:transferOptions 0..N
-    #            /gmd:MD_DigitalTransferOptions
-    #                /transferSize 0..1
-    #                /gmd:onLine 0..N
-    #                    /gmd:CI_OnlineResource
-
-#        ISOResourceLocator(
-#            name="resource-locator",
-#            search_paths=[
-#                "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource",
-#                "gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorTransferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource"
-#            ],
-#            multiplicity="*",
-#        ),
 
     s.ISODocument.elements.append(
         s.ISOElement(
@@ -299,7 +282,7 @@ class OGDATHarvesterPlugin(p.SingletonPlugin):
 
         # 26: update frequency
         if iso_values['frequency-of-update']:
-            package_dict['extras'].append({'key': 'geographic_bbox', 'value': self._map_frequency(iso_values['frequency-of-update'])})
+            package_dict['extras'].append({'key': 'update_frequency', 'value': self._map_frequency(iso_values['frequency-of-update'])})
 
         # 27: lineage
         if iso_values['lineage']:
@@ -338,14 +321,9 @@ class OGDATHarvesterPlugin(p.SingletonPlugin):
 
         resources = []
 
-        log.info("FOUND TRANSFER OPTS: %d" %  len(transfer_options))
-
         for transfer_option in transfer_options:
 
             resources_num = len(transfer_option['online-resource'])
-
-            log.info("FOUND ONLINE RESOURCES: %d" %  resources_num)
-
 
             for resource_locator in transfer_option['online-resource']:
                 # same block as csw harvester
@@ -514,7 +492,7 @@ class OGDATHarvesterPlugin(p.SingletonPlugin):
                  resource['name'] = resource_locator.get('name') or "Raster file"
                  resource['description'] = resource_locator.get('description') or "Raster file"
         else:
-            for ext,fmt in map_ext_type:
+            for ext,fmt in map_ext_type.items():
                  if resource_locator.get('name').endswith(ext):
                      log.info('Assign fmt %s to ext %s', fmt, ext)
                      resource_format = fmt
@@ -620,4 +598,3 @@ class OGDATHarvesterPlugin(p.SingletonPlugin):
                 return wkt_string.strip()
         else:
             return None
-
